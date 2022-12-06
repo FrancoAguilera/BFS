@@ -78,17 +78,11 @@ Step two: create a mapping to represent the "friends graph"
     visited: false, 
     parent: null 
   }
-  Liz: { 
-    node: 'Liz', 
-    edges: [ 'Robert' ], 
-    visited: false, 
-    parent: null 
-  }
 }
 ```  
 
 Step three: apply the BFS algorithm
-See example in ["Find the path"](https://github.com/FrancoAguilera/Breadth-first-search/blob/main/findPath.ts)
+See example in ["Find the path"](https://github.com/FrancoAguilera/Breadth-first-search/blob/85f8fff832b7edb0cd4d3fe5a24b1976f023365d/findPath.ts#L140)
 
 
 ---
