@@ -56,21 +56,17 @@ const friends: Friendship[] = [
   },
 ];
 
-// create an array with all the unique nodes on the edges list
-const nodes = friends.reduce((nodes: string[], friendship: Friendship) => {
-  if (!nodes.includes(friendship.friendOne)) {
-    nodes.push(friendship.friendOne);
-  }
-
-  if (!nodes.includes(friendship.friendTwo)) {
-    nodes.push(friendship.friendTwo);
-  }
-
-  return nodes;
-}, []); // [ 'Jhon', 'Matt', 'Robert', 'Ana', 'Susan', 'Liz' ]
+// create an array with all the possible nodes on the list
+let nodes = [];
+for (let i = 0; i < friends.length; i++) {
+  nodes.push(friends[i].friendOne);
+  nodes.push(friends[i].friendTwo);
+}
+// remove duplicated values
+nodes = [...new Set(nodes)]; // [ 'Jhon', 'Matt', 'Robert', 'Ana', 'Susan', 'Liz' ]
 
 // Create he Graph of nodes and the edges array assosiated to it
-const graph = nodes.reduce((graph: FriendsGraph, node) => {
+const graph = nodes.reduce<FriendsGraph>((graph: FriendsGraph, node: string) => {
   const edges = friends.reduce((edgesList: string[], edge) => {
     if (edge.friendOne === node) {
       edgesList.push(edge.friendTwo);
@@ -87,14 +83,14 @@ const graph = nodes.reduce((graph: FriendsGraph, node) => {
     node,
     edges,
     visited: false,
-    parent: null,
+    parent: null, // this will be used to find the connected nodes
   };
 
   return graph;
 }, {});
 
 /*
-this is how the graph should look
+this is how the graph should look like
 {
   Jhon: {
     node: 'Jhon',
@@ -135,10 +131,25 @@ this is how the graph should look
 }
 */
 
+const getPath = (currentNode: Nodes): string[] => {
+  // return the connection path
+  const path = [];
+  path.push(currentNode.node);
+
+  let next = currentNode.parent;
+  while (next != null) {
+    path.push(next.node);
+    next = next.parent;
+  }
+
+  return path;
+};
+
 // and now we have a graph map about the connections, we can apply
 // the BFS algorithm
-const findConnection = (connection: Friendship): void => {
+const findConnection = (connection: Friendship): string[] => {
   const { friendOne: start, friendTwo: end } = connection;
+  const path = [];
 
   // BFS algorithm
   const queue = [];
@@ -152,22 +163,8 @@ const findConnection = (connection: Friendship): void => {
     const current: Nodes = queue.shift()!;
 
     if (current.node === end) {
-      console.log("Found connection!");
-
-      // optionally you can print the connection between start and and nodes
-      /*
-      const path = [];
-      path.push(current.node);
-
-      let next = current.parent;
-      while (next != null) {
-        path.push(next.node);
-        next = next.parent;
-      }
-
-      console.log(path);
-      */
-      return;
+      console.log("Found connection");
+      return getPath(current);
     }
 
     for (let i = 0; i < current.edges.length; i++) {
@@ -180,7 +177,8 @@ const findConnection = (connection: Friendship): void => {
     }
   }
 
-  console.log("No connection found");
+  return path;
 };
 
-findConnection({ friendOne: "Jhon", friendTwo: "Liz" }); // [ 'Liz', 'Robert', 'Jhon' ]
+const connectionPath = findConnection({ friendOne: "Jhon", friendTwo: "Liz" });
+// [ 'Liz', 'Robert', 'Jhon' ]
